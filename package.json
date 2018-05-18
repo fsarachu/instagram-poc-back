@@ -5,5 +5,8 @@
   "repository": "https://github.com/fsarachu/instagram-poc-back",
   "author": "Franco Sarachu",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "express": "^4.16.3"
+  }
 }
