@@ -1,0 +1,9 @@
+{
+  "name": "instagram-poc-back",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/fsarachu/instagram-poc-back",
+  "author": "Franco Sarachu",
+  "license": "MIT",
+  "private": true
+}
