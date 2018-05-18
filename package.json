@@ -6,6 +6,10 @@
   "author": "Franco Sarachu",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "start": "node ./index",
+    "start-dev": "nodemon ./index"
+  },
   "dependencies": {
     "express": "^4.16.3"
   },
