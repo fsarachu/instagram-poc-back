@@ -1,8 +1,14 @@
-const express = require('express');
+// Load .env file in dev mode
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').load();
+}
 
-const PORT = process.env.PORT || 5000;
+// Modules
+const express = require('express');
 const app = express();
 
-app.get('/', (req, res) => res.send('Hello World!'));
+// Route handlers
+app.get('/', (req, res) => res.json({msg: 'hello'}));
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+// Bring it up
+app.listen(process.env.PORT, () => console.log(`Listening on port ${process.env.PORT}`));

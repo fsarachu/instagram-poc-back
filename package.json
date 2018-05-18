@@ -11,6 +11,7 @@
     "start-dev": "nodemon ./index"
   },
   "dependencies": {
+    "dotenv": "^5.0.1",
     "express": "^4.16.3"
   },
   "devDependencies": {
