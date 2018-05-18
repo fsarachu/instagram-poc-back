@@ -5,22 +5,18 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Modules
 const express = require('express');
+const bodyParser = require('body-parser');
 const initDB = require('./db');
+const registerModules = require('./modules');
 const app = express();
-const User = require('./db/models/User');
+
+// Setup middleware
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // Register route handlers
+registerModules(app);
 app.get('/', (req, res) => res.json({msg: 'hello'}));
-
-app.get('/users', (req, res) => {
-    return User.find()
-        .then(users => {
-            return res.json({data: users});
-        })
-        .catch(e => {
-            return res.json({error: e});
-        });
-});
 
 // Bring it up
 initDB()

@@ -11,6 +11,7 @@
     "start-dev": "nodemon ./index"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "mongoose": "^5.1.1"
