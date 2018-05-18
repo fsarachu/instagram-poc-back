@@ -12,7 +12,14 @@ const registerModules = require('./modules');
 const app = express();
 
 // Setup middleware
-app.use(cors());
+const corsOptions = {
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    exposedHeaders: ['x-auth-token']
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
