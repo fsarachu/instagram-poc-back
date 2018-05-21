@@ -25,7 +25,6 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 
 // Register route handlers
 registerModules(app);
-app.get('/', (req, res) => res.json({msg: 'hello'}));
 
 // Bring it up
 initDB()
