@@ -1,5 +1,5 @@
 const Router = require('express').Router;
-const User = require('../db/models/User');
+const Account = require('../db/models/Account');
 const GraphApi = require('../libs/GraphApi');
 const router = new Router();
 
@@ -29,6 +29,7 @@ function validateAccessToken(req, res, next) {
 
     if (!accessToken) {
         const error = 'Missing required "accessToken" parameter';
+        console.error(error);
         return res.status(400).json({error});
     }
 
@@ -84,27 +85,102 @@ function extendUserToken(req, res, next) {
 
 }
 
-function upsertUser(req, res, next) {
-    const query = {"facebookProvider.id": req.fbUser.id};
-    const userData = {facebookProvider: req.fbUser};
+function getPage(req, res, next) {
+    const {pageId} = req.body;
+    const {longLivedToken} = req.fbUser;
 
-    User.findOne(query)
-        .then(user => {
-            if (user) {
-                console.log(`Facebook user "${req.fbUser.id}" found with _id "${user._id}", updating`);
-                user.set(userData);
-            } else {
-                console.log(`Facebook user "${req.fbUser.id}" not found, creating`);
-                user = new User(userData);
+    if (!pageId) {
+        const error = 'Missing required "pageId" parameter';
+        return res.status(400).json({error});
+    }
+
+    GraphApi.getPage(pageId, longLivedToken)
+        .then(page => {
+
+            // Validation
+            if (!page.connected_instagram_account) {
+                throw new Error(`Facebook page "${page.id}" has no connected Instagram account`);
             }
 
-            return user.save().then(savedUser => {
-                req.localUser = savedUser;
+            // Normalize and save page info to request
+            req.fbPage = {
+                id: page.id,
+                accessToken: page.access_token,
+                name: page.name,
+                picture: page.picture.data.url,
+            };
+
+            req.igProfile = {
+                id: page.connected_instagram_account.id,
+            };
+
+            next();
+        })
+        .catch(error => {
+            const message = "Error connecting Facebook page";
+            console.error(message);
+            console.error(error.message);
+            return res.status(400).json({error: message});
+        })
+        .catch(next);
+}
+
+function getInstagramProfile(req, res, next) {
+    const {id} = req.igProfile;
+    const {accessToken} = req.fbPage;
+
+    GraphApi.getInstagramProfile(id, accessToken)
+        .then(profile => {
+
+            // Normalize and save page info to request
+            req.igProfile = {
+                id: profile.id,
+                igId: profile.ig_id,
+                username: profile.username,
+                name: profile.name,
+                followersCount: profile.followers_count,
+                followsCount: profile.follows_count,
+                mediaCount: profile.media_count,
+                profilePictureUrl: profile.profile_picture_url,
+                media: profile.media.data,
+            };
+
+            next();
+        })
+        .catch(error => {
+            const message = "Error connecting Instagram profile";
+            console.error(message);
+            console.error(error.message);
+            return res.status(500).json({error: message});
+        })
+        .catch(next);
+}
+
+function upsertAccount(req, res, next) {
+    const query = {"instagramProfile.id": req.igProfile.id};
+    const accountData = {
+        facebookPage: req.fbPage,
+        facebookUser: req.fbUser,
+        instagramProfile: req.igProfile,
+    };
+
+    Account.findOne(query)
+        .then(account => {
+            if (account) {
+                console.log(`Account with Instagram Profile "${req.igProfile.id}" found with _id "${account._id}", updating`);
+                account.set(accountData);
+            } else {
+                console.log(`Account with Instagram Profile "${req.igProfile.id}" not found, creating`);
+                account = new Account(accountData);
+            }
+
+            return account.save().then(savedAccount => {
+                req.account = savedAccount;
                 next();
             });
         })
         .catch(e => {
-            const message = "Couldn't create user";
+            const message = "Couldn't create account";
             console.error(message);
             console.error(e);
             return res.status(400).json({error: message});
@@ -114,10 +190,9 @@ function upsertUser(req, res, next) {
 }
 
 function logger(req, res, next) {
-    const {fbUser, localUser} = req;
-    return res.json({fbUser, localUser});
+    return res.json(req.account);
 }
 
-router.post('/auth/facebook', validateAccessToken, extendUserToken, upsertUser, logger);
+router.post('/auth/facebook', validateAccessToken, extendUserToken, getPage, getInstagramProfile, upsertAccount, logger);
 
 module.exports = router;
