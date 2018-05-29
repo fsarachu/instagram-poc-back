@@ -16,6 +16,7 @@ const accountSchema = mongoose.Schema({
         followsCount: Number,
         mediaCount: Number,
         profilePictureUrl: String,
+        media: Array
     },
 });
 
