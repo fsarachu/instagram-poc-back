@@ -1,5 +1,5 @@
-const users = require('./users');
 const auth = require('./auth');
+const users = require('./users');
 
 module.exports = function (app) {
     app
