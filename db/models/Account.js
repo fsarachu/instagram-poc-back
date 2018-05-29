@@ -7,7 +7,13 @@ const accountSchema = mongoose.Schema({
         accessToken: String,
         picture: String,
     },
-    instagramAccount: {
+    facebookUser: {
+        id: String,
+        scopes: Array,
+        shortLivedToken: String,
+        longLivedToken: String,
+    },
+    instagramProfile: {
         id: String,
         igId: Number,
         username: String,
