@@ -44,8 +44,17 @@ function getPage(pageId, accessToken) {
         });
 }
 
-function getInstagramProfile(instagramAccountId, longLivedToken) {
-    return axios.get(`/${instagramAccountId}?access_token=${longLivedToken}&fields=biography,followers_count,follows_count,id,ig_id,media_count,name,profile_picture_url,username,media{media_type,like_count,media_url,permalink,thumbnail_url,id,caption`);
+function getInstagramProfile(instagramAccountId, accessToken) {
+    return axios.get(`/${instagramAccountId}?access_token=${accessToken}&fields=biography,followers_count,follows_count,id,ig_id,name,profile_picture_url,username,media{id,ig_id,like_count,media_type,permalink,shortcode,timestamp,username,media_url,caption,comments_count}`)
+        .then((r) => {
+            const data = r.data;
+
+            if (data.error) {
+                throw data.error;
+            }
+
+            return data;
+        });
 }
 
 module.exports = {
