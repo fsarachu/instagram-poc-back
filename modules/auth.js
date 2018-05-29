@@ -91,10 +91,10 @@ function upsertUser(req, res, next) {
     User.findOne(query)
         .then(user => {
             if (user) {
-                console.log(`Facebook user ${req.fbUser.id} found with _id ${user._id}, updating`);
+                console.log(`Facebook user "${req.fbUser.id}" found with _id "${user._id}", updating`);
                 user.set(userData);
             } else {
-                console.log(`Facebook user ${req.fbUser.id} not found, creating`);
+                console.log(`Facebook user "${req.fbUser.id}" not found, creating`);
                 user = new User(userData);
             }
 
