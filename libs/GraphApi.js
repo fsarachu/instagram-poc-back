@@ -32,7 +32,16 @@ function getLongLivedToken(shortLivedToken) {
 }
 
 function getPage(pageId, longLivedToken) {
-    axios.get(`/${pageId}?access_token=${longLivedToken}&fields=connected_instagram_account,name,picture,access_token`);
+    return axios.get(`/${pageId}?access_token=${longLivedToken}&fields=connected_instagram_account,name,picture,access_token`)
+        .then((r) => {
+            const data = r.data;
+
+            if (data.error) {
+                throw data.error;
+            }
+
+            return data;
+        });
 }
 
 function getInstagramProfile(instagramAccountId, longLivedToken) {
