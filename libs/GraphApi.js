@@ -31,8 +31,8 @@ function getLongLivedToken(shortLivedToken) {
         });
 }
 
-function getPage(pageId, longLivedToken) {
-    return axios.get(`/${pageId}?access_token=${longLivedToken}&fields=connected_instagram_account,name,picture,access_token`)
+function getPage(pageId, accessToken) {
+    return axios.get(`/${pageId}?access_token=${accessToken}&fields=connected_instagram_account,name,picture,access_token`)
         .then((r) => {
             const data = r.data;
 
