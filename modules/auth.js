@@ -4,7 +4,6 @@ const GraphApi = require('../libs/GraphApi');
 const router = new Router();
 
 const requiredScopes = [
-    "email",
     "read_insights",
     "read_audience_network_insights",
     "manage_pages",
