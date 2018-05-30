@@ -1,4 +1,5 @@
 const Router = require('express').Router;
+const jwt = require('jsonwebtoken');
 const Account = require('../db/models/Account');
 const GraphApi = require('../libs/GraphApi');
 const router = new Router();
@@ -189,10 +190,17 @@ function upsertAccount(req, res, next) {
 
 }
 
-function logger(req, res, next) {
-    return res.json(req.account);
+function sendToken(req, res, next) {
+    try {
+        const token = jwt.sign({id: req.account._id}, process.env.JWT_SECRET);
+        return res.status(201).set('Authorization', `Bearer ${token}`).send();
+    } catch (e) {
+        console.error('Error sending token');
+        console.error(e);
+        next(e);
+    }
 }
 
-router.post('/auth/facebook', validateAccessToken, extendUserToken, getPage, getInstagramProfile, upsertAccount, logger);
+router.post('/auth/facebook', validateAccessToken, extendUserToken, getPage, getInstagramProfile, upsertAccount, sendToken);
 
 module.exports = router;
