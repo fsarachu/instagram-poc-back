@@ -44,7 +44,7 @@ function processInstagramPostComment(instagramAccountId, commentId, commentText)
         commentId: commentId,
         mediaId: '17909981962114643',
         username: 'Someone',
-        date: Date.now(),
+        timestamp: Date.now(),
         text: commentText,
         likeCount: 0,
     };
