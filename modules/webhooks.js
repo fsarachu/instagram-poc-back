@@ -12,7 +12,7 @@ function verifyRequest(req, res) {
 }
 
 function processFacebookEvent(req, res) {
-    console.log('Facebook request body:');
+    console.log('Got Facebook webhook event:');
     console.log(req.body);
 
     if (!req.isXHubValid()) {
@@ -29,7 +29,7 @@ function processFacebookEvent(req, res) {
 }
 
 function processInstagramEvent(req, res) {
-    console.log('Instagram request body:');
+    console.log('Got Instagram webhook event:');
     console.log(req.body);
 
     // Process the Instagram updates here
