@@ -26,7 +26,7 @@ function processFacebookEvent(req, res) {
 
 
 function findAccount(instagramAccountId) {
-    Account.findOne({"instagramProfile.id": instagramAccountId})
+    return Account.findOne({"instagramProfile.id": instagramAccountId})
         .then(account => {
             if (!account) {
                 const message = `Instagram Account "${instagramAccountId}" not found`;
