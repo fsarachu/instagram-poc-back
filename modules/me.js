@@ -144,8 +144,9 @@ function verifyJwt(req, res, next) {
         const auth = req.header('Authorization');
 
         if (typeof auth !== 'string') {
-            res.status(401).json({error: 'Missing Authorization header'});
+            return res.status(401).json({error: 'Missing Authorization header'});
         }
+
         const token = auth.slice(7);
         const verified = jwt.verify(token, process.env.JWT_SECRET);
         req.accountId = verified.id;
