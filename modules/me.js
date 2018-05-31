@@ -179,6 +179,45 @@ function getAccount(req, res) {
     res.json(req.account.instagramProfile);
 }
 
+function refreshInstagramAccount(req, res, next) {
+    const {id} = req.account.instagramProfile;
+    const {accessToken} = req.account.facebookPage;
+
+    GraphApi.getInstagramProfile(id, accessToken)
+        .then(profile => {
+
+            // Normalize and save page info to request
+            const updatedData = {
+                instagramProfile: {
+                    username: profile.username,
+                    name: profile.name,
+                    followersCount: profile.followers_count,
+                    followsCount: profile.follows_count,
+                    mediaCount: profile.media_count,
+                    profilePictureUrl: profile.profile_picture_url,
+                    media: profile.media.data,
+                }
+            };
+
+            console.log('Updating instagram profile: ', JSON.stringify(updatedData));
+
+            req.account.set(updatedData);
+
+            return req.account.save()
+                .then(() => next())
+                .catch(next);
+        })
+        .catch(error => {
+            const message = "Error updating Instagram profile";
+            console.error(message);
+            console.error(error.message);
+            return res.status(500).json({error: message});
+        })
+        .catch(next);
+}
+
 router.get('/me', verifyJwt, loadAccount, getAccount);
+
+router.post('/me/sync', verifyJwt, loadAccount, refreshInstagramAccount, getAccount);
 
 module.exports = router;
