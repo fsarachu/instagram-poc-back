@@ -93,6 +93,7 @@ function processInstagramCaptionMention(instagramAccountId, mediaId) {
         username: 'Someone',
         mediaType: "IMAGE",
         timestamp: Date.now(),
+        likesCount: 0,
         mediaUrl: 'https://s3.amazonaws.com/spotlights.upshow.tv/7bcc7f1b-e707-418c-b8be-f12a8246d4c4_nice-background.png',
     };
 
