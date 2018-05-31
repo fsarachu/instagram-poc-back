@@ -126,6 +126,21 @@ function getPage(req, res, next) {
         .catch(next);
 }
 
+function installApp(req, res, next) {
+    GraphApi.subscribeAppToPage(req.fbPage.id, req.fbPage.accessToken)
+        .then(r => {
+            console.log(`Successfully subscribed app to page ${req.fbPage.id}: `, JSON.stringify(r));
+            next();
+        })
+        .catch(error => {
+            const message = "Error subscribing app to Facebook page";
+            console.error(message);
+            console.error(error);
+            return res.status(400).json({error: message});
+        })
+        .catch(next);
+}
+
 function getInstagramProfile(req, res, next) {
     const {id} = req.igProfile;
     const {accessToken} = req.fbPage;
@@ -201,6 +216,6 @@ function sendToken(req, res, next) {
     }
 }
 
-router.post('/auth/facebook', validateAccessToken, extendUserToken, getPage, getInstagramProfile, upsertAccount, sendToken);
+router.post('/auth/facebook', validateAccessToken, extendUserToken, getPage, installApp, getInstagramProfile, upsertAccount, sendToken);
 
 module.exports = router;

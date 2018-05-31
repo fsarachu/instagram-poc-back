@@ -44,6 +44,19 @@ function getPage(pageId, accessToken) {
         });
 }
 
+function subscribeAppToPage(pageId, accessToken) {
+    return axios.post(`${pageId}/subscribed_apps?access_token=${accessToken}`)
+        .then((r) => {
+            const data = r.data;
+
+            if (!data.success) {
+                throw data.error || `Cannot install app on facebook page with id ${pageId}`;
+            }
+
+            return data;
+        })
+}
+
 function getInstagramProfile(instagramAccountId, accessToken) {
     return axios.get(`/${instagramAccountId}?access_token=${accessToken}&fields=biography,followers_count,follows_count,id,ig_id,name,profile_picture_url,username,media{id,ig_id,like_count,media_type,permalink,shortcode,timestamp,username,media_url,caption,comments_count}`)
         .then((r) => {
@@ -62,4 +75,5 @@ module.exports = {
     getLongLivedToken,
     getPage,
     getInstagramProfile,
+    subscribeAppToPage
 };
