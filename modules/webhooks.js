@@ -85,10 +85,12 @@ function processInstagramCommentMention(instagramAccountId, commentId, mediaId) 
 function processInstagramCaptionMention(instagramAccountId, mediaId) {
     // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/user/mentioned_media
     const mentionMock = {
-        commentId: "17841405309211844",
         mediaId: "17918195224117851",
+        commentId: "17841405309211844",
         caption: "@upshow This is a mocked caption!",
+        username: 'Someone',
         mediaType: "IMAGE",
+        timestamp: Date.now(),
         mediaUrl: 'https://s3.amazonaws.com/spotlights.upshow.tv/7bcc7f1b-e707-418c-b8be-f12a8246d4c4_nice-background.png',
     };
 
