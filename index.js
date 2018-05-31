@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Modules
 const express = require('express');
+const xhub = require('express-x-hub');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const initDB = require('./db');
@@ -20,6 +21,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(xhub({ algorithm: 'sha1', secret: process.env.FB_APP_SECRET }));
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
