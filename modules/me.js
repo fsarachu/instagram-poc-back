@@ -161,6 +161,11 @@ function verifyJwt(req, res, next) {
 function loadAccount(req, res, next) {
     Account.findById(req.accountId)
         .then(account => {
+
+            if(!account) {
+                throw new Error('Account not found');
+            }
+
             req.account = account;
             next();
         })
