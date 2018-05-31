@@ -23,7 +23,11 @@ const accountSchema = mongoose.Schema({
         followsCount: Number,
         mediaCount: Number,
         profilePictureUrl: String,
-        media: Array
+        media: Array,
+        activity: {
+            type: Array,
+            'default': Array
+        }
     },
 });
 
