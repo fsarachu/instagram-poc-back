@@ -41,15 +41,15 @@ function findAccount(instagramAccountId) {
 function processInstagramPostComment(instagramAccountId, commentId, commentText) {
     // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/comment#reading
     const commentMock = {
-        id: commentId,
+        commentId: commentId,
+        mediaId: '17909981962114643',
         username: 'Someone',
         date: Date.now(),
         text: commentText,
         likeCount: 0,
-        mediaId: '17909981962114643',
     };
 
-    findAccount(instagramAccountId)
+    return findAccount(instagramAccountId)
         .then(acc => {
             const activityItem = {
                 event: 'post_comment',
@@ -64,13 +64,15 @@ function processInstagramPostComment(instagramAccountId, commentId, commentText)
 function processInstagramCommentMention(instagramAccountId, commentId, mediaId) {
     // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/user/mentioned_comment
     const mentionMock = {
+        commentId,
+        mediaId,
         username: 'Someone',
         timestamp: Date.now(),
         likesCount: 0,
         text: '@example This is some dummy text',
     };
 
-    findAccount(instagramAccountId)
+    return findAccount(instagramAccountId)
         .then(acc => {
             const activityItem = {
                 event: 'comment_mention',
@@ -85,8 +87,8 @@ function processInstagramCommentMention(instagramAccountId, commentId, mediaId) 
 function processInstagramCaptionMention(instagramAccountId, mediaId) {
     // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/user/mentioned_media
     const mentionMock = {
-        mediaId: "17918195224117851",
         commentId: "17841405309211844",
+        mediaId,
         caption: "@upshow This is a mocked caption!",
         username: 'Someone',
         mediaType: "IMAGE",
@@ -94,7 +96,7 @@ function processInstagramCaptionMention(instagramAccountId, mediaId) {
         mediaUrl: 'https://s3.amazonaws.com/spotlights.upshow.tv/7bcc7f1b-e707-418c-b8be-f12a8246d4c4_nice-background.png',
     };
 
-    findAccount(instagramAccountId)
+    return findAccount(instagramAccountId)
         .then(acc => {
             const activityItem = {
                 event: 'caption_mention',
