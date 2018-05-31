@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const timestamps = require('mongoose-timestamp');
 
 const accountSchema = mongoose.Schema({
     facebookPage: {
@@ -25,5 +26,7 @@ const accountSchema = mongoose.Schema({
         media: Array
     },
 });
+
+accountSchema.plugin(timestamps);
 
 module.exports = mongoose.model('Account', accountSchema);
