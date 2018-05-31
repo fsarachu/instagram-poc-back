@@ -114,7 +114,8 @@ function processInstagramEvent(req, res) {
     const entries = req.body.entry;
 
     const promises = entries.map(entry => {
-        const instagramAccountId = entry.id;
+        // const instagramAccountId = entry.id;
+        const instagramAccountId = '17841403676748313'; // Hardcoded, test id wont work
         const changeField = entry.changes[0].field;
         const changeValue = entry.changes[0].value;
 
