@@ -12,7 +12,7 @@ function verifyRequest(req, res) {
 
 function processFacebookEvent(req, res) {
     console.log('Got Facebook webhook event:');
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
 
     if (!req.isXHubValid()) {
         console.warn('Warning - request header X-Hub-Signature not present or invalid');
@@ -111,7 +111,7 @@ function processInstagramCaptionMention(instagramAccountId, mediaId) {
 
 function processInstagramEvent(req, res) {
     console.log('Got Instagram webhook event:');
-    console.log(req.body);
+    console.log(JSON.stringify(req.body));
 
     // Process the Instagram updates here
     const entries = req.body.entry;
