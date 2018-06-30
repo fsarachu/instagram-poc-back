@@ -2,7 +2,7 @@ const Router = require('express').Router;
 const router = new Router();
 const Account = require('../db/models/Account');
 
-function verifyRequest(req, res) {
+function verifyWebhookRequest(req, res) {
     if (req.param('hub.mode') == 'subscribe' && req.param('hub.verify_token') == process.env.FB_WEBHOOK_TOKEN) {
         res.send(req.param('hub.challenge'));
     } else {
@@ -23,7 +23,6 @@ function processFacebookEvent(req, res) {
 
     res.sendStatus(200);
 }
-
 
 function findAccount(instagramAccountId) {
     return Account.findOne({"instagramProfile.id": instagramAccountId})
@@ -152,7 +151,7 @@ function processInstagramEvent(req, res) {
 
 }
 
-router.get(['/webhooks/facebook', '/webhooks/instagram'], verifyRequest);
+router.get(['/webhooks/facebook', '/webhooks/instagram'], verifyWebhookRequest);
 
 router.post('/webhooks/facebook', processFacebookEvent);
 
