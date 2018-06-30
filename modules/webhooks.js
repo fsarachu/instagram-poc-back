@@ -3,7 +3,7 @@ const router = new Router();
 const Account = require('../db/models/Account');
 
 function verifyWebhookRequest(req, res) {
-    if (req.param('hub.mode') == 'subscribe' && req.param('hub.verify_token') == process.env.FB_WEBHOOK_TOKEN) {
+    if (req.param('hub.mode') === 'subscribe' && req.param('hub.verify_token') === process.env.FB_WEBHOOK_TOKEN) {
         res.send(req.param('hub.challenge'));
     } else {
         res.sendStatus(400);
@@ -18,8 +18,6 @@ function processFacebookEvent(req, res) {
         console.warn('Warning - request header X-Hub-Signature not present or invalid');
         return res.sendStatus(401);
     }
-
-    console.log('request header X-Hub-Signature validated');
 
     res.sendStatus(200);
 }
