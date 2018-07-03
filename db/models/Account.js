@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const timestamps = require('mongoose-timestamp');
 
 const accountSchema = mongoose.Schema({
+    organizationId: {
+        type: Number,
+        required: true,
+        unique: true
+    },
     facebookPage: {
         id: String,
         name: String,

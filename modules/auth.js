@@ -178,9 +178,10 @@ function upsertAccount(req, res, next) {
         facebookPage: req.fbPage,
         facebookUser: req.fbUser,
         instagramProfile: req.igProfile,
+        organizationId: req.body.organizationId,
     };
 
-    Account.findOne(query)
+    return Account.findOne(query)
         .then(account => {
             if (account) {
                 console.log(`Account with Instagram Profile "${req.igProfile.id}" found with _id "${account._id}", updating`);
@@ -202,7 +203,6 @@ function upsertAccount(req, res, next) {
             return res.status(400).json({error: message});
         })
         .catch(next);
-
 }
 
 function sendToken(req, res, next) {
@@ -212,7 +212,7 @@ function sendToken(req, res, next) {
     } catch (e) {
         console.error('Error sending token');
         console.error(e);
-        next(e);
+        return next(e);
     }
 }
 
