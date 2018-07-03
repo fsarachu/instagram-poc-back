@@ -151,15 +151,15 @@ function verifyJwt(req, res, next) {
         const verified = jwt.verify(token, process.env.JWT_SECRET);
         req.accountId = verified.id;
 
-        next();
+        return next();
     } catch (e) {
-        res.status(401).json({error: 'Failed verifying token'});
+        return res.status(401).json({error: 'Failed verifying token'});
     }
 
 }
 
 function loadAccount(req, res, next) {
-    Account.findById(req.accountId)
+    return Account.findById(req.accountId)
         .then(account => {
 
             if(!account) {
@@ -167,16 +167,16 @@ function loadAccount(req, res, next) {
             }
 
             req.account = account;
-            next();
+            return next();
         })
         .catch(e => {
             console.error(e);
-            res.status(401).json({error: 'Failed loading account'});
+            return res.status(401).json({error: 'Failed loading account'});
         });
 }
 
 function getAccount(req, res) {
-    res.json(req.account.instagramProfile);
+    return res.json(req.account.instagramProfile);
 }
 
 function refreshInstagramAccount(req, res, next) {
