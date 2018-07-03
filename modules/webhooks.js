@@ -4,9 +4,9 @@ const Account = require('../db/models/Account');
 
 function verifyWebhookRequest(req, res) {
     if (req.param('hub.mode') === 'subscribe' && req.param('hub.verify_token') === process.env.FB_WEBHOOK_TOKEN) {
-        res.send(req.param('hub.challenge'));
+        return res.send(req.param('hub.challenge'));
     } else {
-        res.sendStatus(400);
+        return res.sendStatus(400);
     }
 }
 
@@ -19,7 +19,7 @@ function processFacebookEvent(req, res) {
         return res.sendStatus(401);
     }
 
-    res.sendStatus(200);
+    return res.sendStatus(200);
 }
 
 function findAccount(instagramAccountId) {
