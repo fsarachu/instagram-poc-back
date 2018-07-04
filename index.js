@@ -11,6 +11,21 @@ const cors = require('cors');
 const initDB = require('./db');
 const registerModules = require('./modules');
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
+server.listen(process.env.PORT);
+console.log(`Listening on port ${process.env.PORT}`);
+
+// handle incoming connections from clients
+io.on('connection', function(socket) {
+    console.log('Connected');
+    // once a client has connected, we expect to get a ping from them saying what room they want to join
+    socket.on('join room', function(room) {
+        console.log(`Joining room ${room}`);
+        socket.join(room);
+    });
+});
 
 // Setup middleware
 const corsOptions = {
@@ -20,6 +35,11 @@ const corsOptions = {
     exposedHeaders: ['Authorization'],
 };
 
+// Make io accessible to our router
+app.use(function(req,res,next){
+    req.io = io;
+    next();
+});
 app.use(cors(corsOptions));
 app.use(xhub({ algorithm: 'sha1', secret: process.env.FB_APP_SECRET }));
 app.use(bodyParser.json()); // for parsing application/json
@@ -32,7 +52,6 @@ registerModules(app);
 initDB()
     .then(() => {
         console.log('Connected to database');
-        app.listen(process.env.PORT, () => console.log(`Listening on port ${process.env.PORT}`));
     })
     .catch(e => {
         console.error('Error connecting to database');

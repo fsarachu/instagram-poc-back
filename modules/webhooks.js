@@ -100,7 +100,7 @@ function processInstagramCaptionMention(instagramAccountId, mediaId) {
         });
 }
 
-function saveMockedMention() {
+function saveMockedMention(req) {
     const mockedMention = {
         "id": Date.now(),
         "url": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
@@ -148,6 +148,10 @@ function saveMockedMention() {
     return Account.find({})
         .then(accounts => {
             return Promise.all(accounts.map(acc => {
+                //Emit new mention
+                const orgId = acc.organizationId;
+                req.io.in(`org-${orgId}`).emit('new mention', mockedMention);
+
                 acc.mentions.unshift(mockedMention);
                 return acc.save();
             }));
@@ -182,7 +186,7 @@ function processInstagramEvent(req, res) {
             promise = Promise.resolve();
         }
 
-        return promise.then(saveMockedMention);
+        return promise.then(() => saveMockedMention(req));
     });
 
     Promise.all(promises)
