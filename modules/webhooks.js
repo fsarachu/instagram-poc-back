@@ -182,7 +182,7 @@ function processInstagramEvent(req, res) {
             promise = Promise.resolve();
         }
 
-        return saveMockedMention().then(promise);
+        return promise.then(saveMockedMention);
     });
 
     Promise.all(promises)
