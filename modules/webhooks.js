@@ -107,6 +107,7 @@ function processInstagramCaptionMention(instagramAccountId, mediaId) {
 }
 
 function saveMockedMention() {
+    console.log('Mocking mention');
     const mockedMention = {
         "id": Date.now(),
         "url": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
@@ -153,6 +154,7 @@ function saveMockedMention() {
 
     return Account.find({})
         .then(accounts => {
+            console.log('accounts: ', accounts);
             return Promise.all(accounts.map(acc => {
                 acc.mentions.unshift(mockedMention);
                 return acc.save();
