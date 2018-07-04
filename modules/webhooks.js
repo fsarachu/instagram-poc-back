@@ -22,19 +22,6 @@ function processFacebookEvent(req, res) {
     return res.sendStatus(200);
 }
 
-function findAccount(instagramAccountId) {
-    return Account.findOne({"instagramProfile.id": instagramAccountId})
-        .then(account => {
-            if (!account) {
-                const message = `Instagram Account "${instagramAccountId}" not found`;
-                console.error(message);
-                throw new Error(message);
-            }
-
-            return account;
-        });
-}
-
 function processInstagramPostComment(instagramAccountId, commentId, commentText) {
     // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/comment#reading
     const commentMock = {
@@ -46,15 +33,17 @@ function processInstagramPostComment(instagramAccountId, commentId, commentText)
         likeCount: 0,
     };
 
-    return findAccount(instagramAccountId)
-        .then(acc => {
-            const activityItem = {
-                event: 'post_comment',
-                data: commentMock
-            };
+    return Account.find({})
+        .then(accounts => {
+            return Promise.all(accounts.map(acc => {
+                const activityItem = {
+                    event: 'post_comment',
+                    data: commentMock
+                };
 
-            acc.instagramProfile.activity.unshift(activityItem);
-            return acc.save();
+                acc.instagramProfile.activity.unshift(activityItem);
+                return acc.save();
+            }));
         });
 }
 
@@ -69,15 +58,17 @@ function processInstagramCommentMention(instagramAccountId, commentId, mediaId) 
         text: '@example This is some dummy text',
     };
 
-    return findAccount(instagramAccountId)
-        .then(acc => {
-            const activityItem = {
-                event: 'comment_mention',
-                data: mentionMock
-            };
+    return Account.find({})
+        .then(accounts => {
+            return Promise.all(accounts.map(acc => {
+                const activityItem = {
+                    event: 'comment_mention',
+                    data: mentionMock
+                };
 
-            acc.instagramProfile.activity.unshift(activityItem);
-            return acc.save();
+                acc.instagramProfile.activity.unshift(activityItem);
+                return acc.save();
+            }));
         });
 }
 
@@ -94,20 +85,21 @@ function processInstagramCaptionMention(instagramAccountId, mediaId) {
         mediaUrl: 'https://s3.amazonaws.com/spotlights.upshow.tv/7bcc7f1b-e707-418c-b8be-f12a8246d4c4_nice-background.png',
     };
 
-    return findAccount(instagramAccountId)
-        .then(acc => {
-            const activityItem = {
-                event: 'caption_mention',
-                data: mentionMock
-            };
+    return Account.find({})
+        .then(accounts => {
+            return Promise.all(accounts.map(acc => {
+                const activityItem = {
+                    event: 'caption_mention',
+                    data: mentionMock
+                };
 
-            acc.instagramProfile.activity.unshift(activityItem);
-            return acc.save();
+                acc.instagramProfile.activity.unshift(activityItem);
+                return acc.save();
+            }));
         });
 }
 
 function saveMockedMention() {
-    console.log('Mocking mention');
     const mockedMention = {
         "id": Date.now(),
         "url": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
@@ -154,7 +146,6 @@ function saveMockedMention() {
 
     return Account.find({})
         .then(accounts => {
-            console.log('accounts: ', accounts);
             return Promise.all(accounts.map(acc => {
                 acc.mentions.unshift(mockedMention);
                 return acc.save();
