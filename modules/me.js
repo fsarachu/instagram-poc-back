@@ -181,9 +181,9 @@ function getAccount(req, res) {
 
 function getMentions(req, res) {
     const data = {
-        username: req.account.username,
+        username: req.account.instagramProfile.username,
         profilePictureUrl: req.account.instagramProfile.profilePictureUrl,
-        mentions: req.account.instagramProfile.mentions,
+        mentions: req.account.mentions,
     };
     return res.json(data);
 }
