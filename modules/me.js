@@ -179,6 +179,15 @@ function getAccount(req, res) {
     return res.json(req.account.instagramProfile);
 }
 
+function getMentions(req, res) {
+    const data = {
+        username: req.account.username,
+        profilePictureUrl: req.account.profilePictureUrl,
+        mentions: req.account.mentions,
+    };
+    return res.json(data);
+}
+
 function refreshInstagramAccount(req, res, next) {
     const {id} = req.account.instagramProfile;
     const {accessToken} = req.account.facebookPage;
@@ -215,6 +224,8 @@ function refreshInstagramAccount(req, res, next) {
         })
         .catch(next);
 }
+
+router.get('/me/mentions', verifyJwt, loadAccount, getMentions);
 
 router.get('/me', verifyJwt, loadAccount, getAccount);
 
