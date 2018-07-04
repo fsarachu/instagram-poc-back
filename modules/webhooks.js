@@ -35,6 +35,7 @@ function processInstagramPostComment(instagramAccountId, commentId, commentText)
 
     return Account.find({})
         .then(accounts => {
+            // console.log('accounts: ', accounts.map(a => a._id));
             return Promise.all(accounts.map(acc => {
                 const activityItem = {
                     event: 'post_comment',
@@ -181,7 +182,7 @@ function processInstagramEvent(req, res) {
             promise = Promise.resolve();
         }
 
-        return Promise.all([promise, saveMockedMention()]);
+        return promise.then(saveMockedMention);
     });
 
     Promise.all(promises)
