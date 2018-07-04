@@ -1,3 +1,4 @@
+const moment = require('moment');
 const Router = require('express').Router;
 const router = new Router();
 const Account = require('../db/models/Account');
@@ -123,8 +124,8 @@ function saveMockedMention(req) {
         "comments": 0,
         "rating": null,
         "postedAt": {
-            "raw_date": "Tue Jul 03 2018 23:46:33 GMT+0000 (UTC)",
-            "date": "2018-07-03 23:46:33.000000",
+            "raw_date": moment().toString()/*"Tue Jul 03 2018 23:46:33 GMT+0000"*/,
+            "date": moment().format("YYYY-MM-DD HH:mm:ss.SSSSSS")/*"2018-07-03 23:46:33.000000"*/,
             "timezone": "UTC",
             "timezone_type": 3
         },
