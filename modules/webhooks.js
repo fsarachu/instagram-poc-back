@@ -106,6 +106,60 @@ function processInstagramCaptionMention(instagramAccountId, mediaId) {
         });
 }
 
+function saveMockedMention() {
+    const mockedMention = {
+        "id": Date.now(),
+        "url": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
+        "type": 1,
+        "thumbnail": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
+        "title": null,
+        "description": "This is a test",
+        "createdAt": {
+            "raw_date": "Tue Jul 03 2018 23:46:37 GMT+0000 (UTC)",
+            "date": "2018-07-03 23:46:37.000000",
+            "timezone": "UTC",
+            "timezone_type": 3
+        },
+        "updatedAt": null,
+        "network": "instagram",
+        "locationId": null,
+        "permalink": "https://www.instagram.com/p/BeEFXJ_nhau/",
+        "reach": 11,
+        "favs": 0,
+        "comments": 0,
+        "rating": null,
+        "postedAt": {
+            "raw_date": "Tue Jul 03 2018 23:46:33 GMT+0000 (UTC)",
+            "date": "2018-07-03 23:46:33.000000",
+            "timezone": "UTC",
+            "timezone_type": 3
+        },
+        "isDeleted": false,
+        "isPinned": false,
+        "user": {
+            "id": 123,
+            "profileId": "12345",
+            "userName": "upshow",
+            "profilePicture": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
+            "profileUrl": "https://www.instagram.com/upshow/",
+            "network": "instagram",
+            "createdAt": null,
+            "followers": 3092,
+            "updatedAt": null
+        },
+        "gridThumbnail": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
+        "zoomURL": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg"
+    };
+
+    return Account.find({})
+        .then(accounts => {
+            return Promise.all(accounts.map(acc => {
+                acc.mentions.unshift(mockedMention);
+                return acc.save();
+            }));
+        });
+}
+
 function processInstagramEvent(req, res) {
     console.log('Got Instagram webhook event:');
     console.log(JSON.stringify(req.body));
@@ -134,7 +188,7 @@ function processInstagramEvent(req, res) {
             promise = Promise.resolve();
         }
 
-        return promise;
+        return Promise.all([promise, saveMockedMention()]);
     });
 
     Promise.all(promises)

@@ -34,6 +34,10 @@ const accountSchema = mongoose.Schema({
             'default': Array
         }
     },
+    mentions: {
+        type: Array,
+        'default': Array
+    }
 });
 
 accountSchema.plugin(timestamps);
