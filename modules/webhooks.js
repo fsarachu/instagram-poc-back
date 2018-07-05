@@ -108,7 +108,7 @@ function saveMockedMention(req) {
         "type": 1,
         "thumbnail": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
         "title": null,
-        "description": "This is a test",
+        "description": "This is a test @mention!",
         "createdAt": {
             "raw_date": moment().toString()/*"Tue Jul 03 2018 23:46:33 GMT+0000"*/,
             "date": moment().format("YYYY-MM-DD HH:mm:ss.SSSSSS")/*"2018-07-03 23:46:33.000000"*/,
