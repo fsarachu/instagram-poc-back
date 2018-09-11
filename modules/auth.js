@@ -5,14 +5,9 @@ const GraphApi = require('../libs/GraphApi');
 const router = new Router();
 
 const requiredScopes = [
-    "read_insights",
-    "read_audience_network_insights",
-    "manage_pages",
-    "pages_show_list",
-    "instagram_basic",
-    "instagram_manage_comments",
-    "instagram_manage_insights",
-    "public_profile",
+    'public_profile',
+    'manage_pages',
+    'instagram_basic',
 ];
 
 function hasRequiredScopes(scopes) {
