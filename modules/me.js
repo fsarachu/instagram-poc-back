@@ -179,6 +179,18 @@ function getAccount(req, res) {
     return res.json(req.account.instagramProfile);
 }
 
+
+function deleteAccount(req, res) {
+    return req.account.remove()
+        .then(() => {
+            return res.status(204).send();
+        })
+        .catch(e => {
+            console.error(e);
+            return res.status(500).json({error: 'Failed removing account'});
+        });
+}
+
 function getMentions(req, res) {
     const data = {
         username: req.account.instagramProfile.username,
@@ -228,6 +240,8 @@ function refreshInstagramAccount(req, res, next) {
 router.get('/me/mentions', verifyJwt, loadAccount, getMentions);
 
 router.get('/me', verifyJwt, loadAccount, getAccount);
+
+router.delete('/me', verifyJwt, loadAccount, deleteAccount);
 
 router.post('/me/sync', verifyJwt, loadAccount, refreshInstagramAccount, getAccount);
 
