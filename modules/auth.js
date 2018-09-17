@@ -8,6 +8,7 @@ const requiredScopes = [
     'public_profile',
     'manage_pages',
     'instagram_basic',
+    'instagram_manage_comments'
 ];
 
 function hasRequiredScopes(scopes) {
