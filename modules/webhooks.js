@@ -4,8 +4,8 @@ const router = new Router();
 const Account = require('../db/models/Account');
 
 function verifyWebhookRequest(req, res) {
-    if (req.param('hub.mode') === 'subscribe' && req.param('hub.verify_token') === process.env.FB_WEBHOOK_TOKEN) {
-        return res.send(req.param('hub.challenge'));
+    if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.FB_WEBHOOK_TOKEN) {
+        return res.send(req.query['hub.challenge']);
     } else {
         return res.sendStatus(400);
     }
