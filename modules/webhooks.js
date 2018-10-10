@@ -23,32 +23,6 @@ function processFacebookEvent(req, res) {
     return res.sendStatus(200);
 }
 
-function processInstagramPostComment(instagramAccountId, commentId, commentText) {
-    // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/comment#reading
-    const commentMock = {
-        commentId: commentId,
-        mediaId: '17909981962114643',
-        username: 'Someone',
-        timestamp: Date.now(),
-        text: commentText,
-        likeCount: 0,
-    };
-
-    return Account.find({})
-        .then(accounts => {
-            // console.log('accounts: ', accounts.map(a => a._id));
-            return Promise.all(accounts.map(acc => {
-                const activityItem = {
-                    event: 'post_comment',
-                    data: commentMock
-                };
-
-                acc.instagramProfile.activity.unshift(activityItem);
-                return acc.save();
-            }));
-        });
-}
-
 function processInstagramCommentMention(instagramAccountId, commentId, mediaId) {
     // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/user/mentioned_comment
     const mentionMock = {
@@ -174,9 +148,7 @@ function processInstagramEvent(req, res) {
 
         let promise;
 
-        if (changeField === 'comments') {
-            promise = processInstagramPostComment(instagramAccountId, changeValue.id, changeValue.text);
-        } else if (changeField === 'mentions') {
+        if (changeField === 'mentions') {
             if (changeValue.comment_id) {
                 promise = processInstagramCommentMention(instagramAccountId, changeValue.comment_id, changeValue.media_id);
             } else {
