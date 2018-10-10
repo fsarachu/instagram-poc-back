@@ -192,7 +192,7 @@ function processInstagramEvent(req, res) {
 
     Promise.all(promises)
         .then(() => {
-            console.log('Successfully processed Instagram Webhook');
+            console.log(`Successfully processed Instagram Webhook with ${entries.length} entries`);
             return res.sendStatus(200);
         })
         .catch(e => {
