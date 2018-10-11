@@ -15,11 +15,6 @@ function processFacebookEvent(req, res) {
     console.log('Got Facebook webhook event:');
     console.log(JSON.stringify(req.body));
 
-    if (!req.isXHubValid()) {
-        console.warn('Warning - request header X-Hub-Signature not present or invalid');
-        return res.sendStatus(401);
-    }
-
     return res.sendStatus(200);
 }
 
@@ -177,7 +172,7 @@ function processInstagramEvent(req, res) {
 function verifyXhub(req, res, next) {
     if (!req.isXHub || !req.isXHubValid()) {
         console.error('Invalid X-Hub signature in webhook request: ', req.headers);
-        return res.status(401).send();
+        return res.sendStatus(401);
     }
 
     next();
