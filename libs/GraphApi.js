@@ -70,10 +70,39 @@ function getInstagramProfile(instagramAccountId, accessToken) {
         });
 }
 
+function getMentionedMedia(instagramAccountId, mediaId, accessToken) {
+    // TODO: We could also update the account data (profile pic, followers, etc) in this request
+    const fields = [
+        'caption',
+        'comments',
+        'comments_count',
+        'like_count',
+        'media_type',
+        'media_url',
+        'owner',
+        'timestamp',
+        'username',
+    ];
+
+    const url = `/${instagramAccountId}?access_token=${accessToken}&fields=mentioned_media.media_id(${mediaId}){${fields.join(',')}}`;
+
+    return axios.get(url)
+        .then((r) => {
+            const data = r.data;
+
+            if (data.error) {
+                throw data.error;
+            }
+
+            return data.mentioned_media;
+        });
+}
+
 module.exports = {
     inspectToken,
     getLongLivedToken,
     getPage,
     getInstagramProfile,
-    subscribeAppToPage
+    subscribeAppToPage,
+    getMentionedMedia
 };

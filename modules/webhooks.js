@@ -2,6 +2,7 @@ const moment = require('moment');
 const Router = require('express').Router;
 const router = new Router();
 const Account = require('../db/models/Account');
+const GraphApi = require('../libs/GraphApi');
 
 function verifyWebhookRequest(req, res) {
     if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.FB_WEBHOOK_TOKEN) {
@@ -43,89 +44,74 @@ function processInstagramCommentMention(instagramAccountId, commentId, mediaId) 
         });
 }
 
-function processInstagramCaptionMention(instagramAccountId, mediaId) {
-    // Mocked, but should query this node: https://developers.facebook.com/docs/instagram-api/reference/user/mentioned_media
-    const mentionMock = {
-        commentId: "17841405309211844",
-        mediaId,
-        caption: "@upshow This is a mocked caption!",
-        username: 'Someone',
-        mediaType: "IMAGE",
-        timestamp: Date.now(),
-        likesCount: 0,
-        mediaUrl: 'https://s3.amazonaws.com/spotlights.upshow.tv/7bcc7f1b-e707-418c-b8be-f12a8246d4c4_nice-background.png',
-    };
+function processInstagramCaptionMention(req, instagramAccountId, mediaId) {
+    return Account.findOne({"instagramProfile.id": instagramAccountId})
+        .then(acc => {
+            const token = acc.facebookPage.accessToken;
+            return GraphApi.getMentionedMedia(instagramAccountId, mediaId, token)
+                .then(media => {
+                    // Format content
+                    const content = toUpshowContent(media);
 
-    return Account.find({})
-        .then(accounts => {
-            return Promise.all(accounts.map(acc => {
-                const activityItem = {
-                    event: 'caption_mention',
-                    data: mentionMock
-                };
+                    // Emit event for screens
+                    const orgId = acc.organizationId;
+                    req.io.in(`org-${orgId}`).emit('new mention', content);
 
-                acc.instagramProfile.activity.unshift(activityItem);
-                return acc.save();
-            }));
-        });
+                    // Save to DB for enterprise
+                    acc.mentions.unshift(content);
+                    return acc.save();
+                });
+        })
 }
 
-function saveMockedMention(req) {
-    const mockedMention = {
-        "id": Date.now(),
-        "url": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
-        "type": 1,
-        "thumbnail": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
+function toUpshowContent(igMediaObject) {
+    const {id, caption, comments_count, like_count, media_type, media_url, timestamp, username, owner} = igMediaObject;
+
+    // TODO: Support videos and carousels
+    return {
+        id,
+        "url": media_url,
+        "type": media_type === 'VIDEO' ? 2 : 1, // TODO: carousels?
+        "thumbnail": media_url, // TODO: video thumbnail?
         "title": null,
-        "description": "This is a test @mention!",
+        "description": caption,
         "createdAt": {
-            "raw_date": moment().toString()/*"Tue Jul 03 2018 23:46:33 GMT+0000"*/,
-            "date": moment().format("YYYY-MM-DD HH:mm:ss.SSSSSS")/*"2018-07-03 23:46:33.000000"*/,
+            "raw_date": moment(timestamp).toString()/*"Tue Jul 03 2018 23:46:33 GMT+0000"*/,
+            "date": moment(timestamp).format("YYYY-MM-DD HH:mm:ss.SSSSSS")/*"2018-07-03 23:46:33.000000"*/,
             "timezone": "UTC",
             "timezone_type": 3
         },
         "updatedAt": null,
         "network": "instagram",
         "locationId": null,
-        "permalink": "https://www.instagram.com/p/BeEFXJ_nhau/",
-        "reach": 11,
-        "favs": 0,
-        "comments": 0,
+        "permalink": "https://www.instagram.com/p/BeEFXJ_nhau/", // TODO
+        "reach": like_count + comments_count,
+        "favs": like_count,
+        "comments": comments_count,
         "rating": null,
         "postedAt": {
-            "raw_date": moment().toString()/*"Tue Jul 03 2018 23:46:33 GMT+0000"*/,
-            "date": moment().format("YYYY-MM-DD HH:mm:ss.SSSSSS")/*"2018-07-03 23:46:33.000000"*/,
+            "raw_date": moment(timestamp).toString()/*"Tue Jul 03 2018 23:46:33 GMT+0000"*/,
+            "date": moment(timestamp).format("YYYY-MM-DD HH:mm:ss.SSSSSS")/*"2018-07-03 23:46:33.000000"*/,
             "timezone": "UTC",
             "timezone_type": 3
         },
         "isDeleted": false,
         "isPinned": false,
         "user": {
-            "id": 123,
-            "profileId": "12345",
-            "userName": "upshow",
-            "profilePicture": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
-            "profileUrl": "https://www.instagram.com/upshow/",
+            "id": owner,
+            "profileId": owner,
+            "userName": username,
+            "profilePicture": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg", // TODO
+            "profileUrl": "https://www.instagram.com/upshow/", // TODO
             "network": "instagram",
-            "createdAt": null,
-            "followers": 3092,
-            "updatedAt": null
+            "createdAt": null, // TODO
+            "followers": 3092, // TODO
+            "updatedAt": null // TODO
         },
-        "gridThumbnail": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg",
-        "zoomURL": "https://s3.amazonaws.com/static.upshow.tv/franco/sample_post.jpg"
+        "gridThumbnail": media_url, // TODO: video thumbnail?
+        "zoomURL": media_url // TODO: video thumbnail?
     };
 
-    return Account.find({})
-        .then(accounts => {
-            return Promise.all(accounts.map(acc => {
-                //Emit new mention
-                const orgId = acc.organizationId;
-                req.io.in(`org-${orgId}`).emit('new mention', mockedMention);
-
-                acc.mentions.unshift(mockedMention);
-                return acc.save();
-            }));
-        });
 }
 
 function processInstagramEvent(req, res) {
@@ -136,25 +122,23 @@ function processInstagramEvent(req, res) {
     const entries = req.body.entry;
 
     const promises = entries.map(entry => {
-        // const instagramAccountId = entry.id;
-        const instagramAccountId = '17841403676748313'; // Hardcoded, test id wont work
-        const changeField = entry.changes[0].field;
-        const changeValue = entry.changes[0].value;
+        const instagramAccountId = entry.id;
+        const change = entry.changes[0];
 
-        let promise;
+        let promise = Promise.resolve();
 
-        if (changeField === 'mentions') {
-            if (changeValue.comment_id) {
-                promise = processInstagramCommentMention(instagramAccountId, changeValue.comment_id, changeValue.media_id);
+        if (change.field === 'mentions') {
+            if (change.value.comment_id) {
+                promise = processInstagramCommentMention(instagramAccountId, change.value.comment_id, change.value.media_id);
             } else {
-                promise = processInstagramCaptionMention(instagramAccountId, changeValue.media_id);
+                promise = processInstagramCaptionMention(req, instagramAccountId, change.value.media_id);
             }
         } else {
-            console.warn(`Unexpected webhook field "${changeField}"`);
+            console.warn(`Unexpected webhook entry field "${change.field}"`);
             promise = Promise.resolve();
         }
 
-        return promise.then(() => saveMockedMention(req));
+        return promise;
     });
 
     Promise.all(promises)
