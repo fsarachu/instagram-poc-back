@@ -174,10 +174,19 @@ function processInstagramEvent(req, res) {
 
 }
 
+function verifyXhub(req, res, next) {
+    if (!req.isXHub || !req.isXHubValid()) {
+        console.error('Invalid X-Hub signature in webhook request: ', req.headers);
+        return res.status(401).send();
+    }
+
+    next();
+}
+
 router.get(['/webhooks/facebook', '/webhooks/instagram'], verifyWebhookRequest);
 
-router.post('/webhooks/facebook', processFacebookEvent);
+router.post('/webhooks/facebook', verifyXhub, processFacebookEvent);
 
-router.post('/webhooks/instagram', processInstagramEvent);
+router.post('/webhooks/instagram', verifyXhub, processInstagramEvent);
 
 module.exports = router;
